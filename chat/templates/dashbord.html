@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% block title %}Login{% endblock  %}
+{% block  body %}
+<div uk-sticky="sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky"> 
+  <nav class="uk-navbar-container" uk-navbar>
+
+    <div class="uk-navbar-left uk-margin-left">
+       <a class="uk-navbar-item uk-logo" href="#"><span><i class="fab fa-rocketchat" style="color: Tomato; margin-right:10px;"></i></span> Chattapp </a>
+    </div>
+
+    <div class="uk-navbar-right uk-margin-right">
+
+        <ul class="uk-navbar-nav">
+            <li>
+                <a href="{{url_for('chat')}}">Chat</a>
+            </li>
+            <li ><a href="#">Welcome : {% if current_user.is_authenticated %} {{ current_user.username }}{% endif %}</a></li>
+            <li>
+                <a href="{{url_for('logout')}}">Logout</a>
+            </li>
+        </ul>
+
+    </div>
+
+</nav>
+</div>
+
+{% block messageshow %}
+
+         {% with messages = get_flashed_messages(with_categories=true) %}
+         {% if messages %}
+         {% for message in messages %}
+         <div class="uk-alert-{{message[0]}}" uk-alert>
+         <a class="uk-alert-close" uk-close></a>
+         <p class="uk-text-center" >{{message[1]}}.</p>
+         </div>
+         {% endfor %}
+         {% endif %}
+         {% endwith %}
+{% endblock %}
+
+<div class="uk-child-width-1-1@m uk-margin-large-top uk-margin-medium-left" uk-grid>
+    <div>
+        <div uk-grid>
+            <div class="uk-width-auto@m">
+                <ul class="uk-tab-left" uk-tab="connect: #component-tab-left; animation: uk-animation-fade">
+                    <li><a href="#">Create Room</a></li>
+                    <li><a href="#">Upload Image</a></li>
+                    <li><a href="#">Send Room</a></li>
+                    <li><a href="#"> My Freind</a></li>
+                </ul>
+            </div>
+            <div class="uk-width-expand@m">
+                <ul id="component-tab-left" class="uk-switcher">
+                    <li>
+
+<form class="uk-form-stacked" action="{{url_for('dashbord')}}" method="POST">
+    {{ form1.hidden_tag() }}
+    <div class="uk-margin">
+        <label class="uk-form-label" for="form-stacked-text">Room Name</label>
+        <div class="uk-form-controls">
+            {{ form1.room(class_="uk-input uk-form-width-medium" ,id_="form-stacked-text" , placeholder="Enter Room name...",autofocus=true) }} 
+               {% if form1.room.errors %}
+               {% for error in form1.room.errors %}
+               <div class="uk-alert-danger" uk-alert>
+                     <a class="uk-alert-close" uk-close></a>
+                        <p>{{error}}</p>
+                     </div>
+               {% endfor %}
+              {% endif %}
+        </div>
+    </div>
+
+    <div class="uk-margin">
+        <div class="uk-form-controls">
+            {{form1.Submit(class_="uk-button uk-button-primary")}}
+        </div>
+    </div>
+</form>
+
+
+</li>
+ <li>
+ <form method="POST" action="{{url_for('dashbord')}}" enctype="multipart/form-data">
+ {{ form2.hidden_tag() }}
+    <div class="uk-margin" uk-margin>
+        <div uk-form-custom="target: true">
+            {{ form2.file() }}
+            <input class="uk-input uk-form-width-medium" type="text" placeholder="Select file" disabled>
+        </div>
+        {% if form2.file.errors %}
+               {% for error in form2.file.errors %}
+               <div class="uk-alert-danger" uk-alert>
+                     <a class="uk-alert-close" uk-close></a>
+                        <p>{{error}}</p>
+                     </div>
+               {% endfor %}
+              {% endif %}
+        {{form2.Upload(class_="uk-button uk-button-primary")}}
+    </div>
+
+</form>
+</li>
+
+<li>
+
+    <div class="uk-overflow-auto">
+    <table class="uk-table uk-table-hover uk-table-middle uk-table-divider">
+        <thead>
+            <tr>
+                <th class="uk-table-shrink"><b>Image</b></th>
+                <th class="uk-table-shrink"><b>Name</b></th>
+                <th class="uk-table-shrink"><b>Send Request Room</b></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for i in all_user %}
+            <tr>
+            {% if i.image_name %}
+                <td><img class="uk-preserve-width uk-border-circle" src="static/image/{{i.image_name}}" width="50"  alt=""></td>
+            {% else %}
+                <td><img class="uk-preserve-width uk-border-circle" src="static/image/user.jpg" width="50"  alt=""></td>
+            {% endif %}    
+                <td class="uk-table-link">{{i.username}}</td>
+                   <td class="uk-table-link"><div>
+                    <a class="uk-button  uk-button-primary uk-button-small" href="send/{{current_user.id}}/{{i.id}}/{{current_user.room}}">Send <i class="fas fa-paper-plane"></i></a></div>
+                </td>  
+            </tr>
+         {% endfor %}
+            
+        </tbody>
+    </table>
+    </div>
+
+</li>
+<li><div class="uk-overflow-auto">
+    <table class="uk-table uk-table-hover uk-table-middle uk-table-divider">
+        <thead>
+            <tr>
+                <th class="uk-table-shrink"><b>Image</b></th>
+                <th class="uk-table-shrink"><b>Name</b></th>
+                <th class="uk-table-shrink"><b>Unfriend</b></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for i in all_friend %}
+            <tr>
+                {% if userobject[loop.index-1].image_name %}
+                <td><img class="uk-preserve-width uk-border-circle" src="static/image/{{userobject[loop.index-1].image_name}}" width="50"  alt=""></td>
+            {% else %}
+                <td><img class="uk-preserve-width uk-border-circle" src="static/image/user.jpg" width="50"  alt=""></td>
+            {% endif %}    
+                <td class="uk-table-link">{{userobject[loop.index-1].username}}</td>
+                   <td class="uk-table-link"><div style="width=100px;">
+                    <a class="uk-button  uk-button-danger uk-button-small" href="unfriend/{{i.send}}/{{i.receive}}">Delete <i class="fas fa-trash-alt"></i></a></div>
+                </td>  
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+</div>
+{% endblock  %}

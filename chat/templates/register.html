@@ -1,0 +1,82 @@
+    {% extends 'base.html' %}
+    {% block title %}Register{% endblock  %}
+    {% block  body %}
+    {% block messageshow %}
+
+         {% with messages = get_flashed_messages(with_categories=true) %}
+         {% if messages %}
+         {% for message in messages %}
+         <div class="uk-alert-{{message[0]}}" uk-alert>
+         <a class="uk-alert-close" uk-close></a>
+         <p class="uk-text-center" >{{message[1]}}.</p>
+         </div>
+         {% endfor %}
+         {% endif %}
+         {% endwith %}
+     {% endblock %}
+    <div class="uk-position-center">
+     <div class="uk-margin-medium-bottom uk-text-center">
+    <i class="fab fa-rocketchat" style="font-size: 4em; color: Tomato;"></i>
+    </div>
+    <div class="uk-card uk-card-default uk-card-body">
+    <form class="uk-form-stacked uk-text-center" action="{{url_for('register')}}" method="POST">
+        {{ form.hidden_tag() }}
+     <div class="uk-margin ">
+        <label class="uk-form-label" for="form-stacked-text">User Name</label>
+        <div class="uk-form-controls">
+        {{ form.name(class_="uk-input uk-form-width-large", id_="form-stacked-text",placeholder="Enter Username",autofocus=true) }} 
+               {% if form.name.errors %}
+        	      {% for error in form.name.errors %}
+        		    <div class="uk-alert-danger" uk-alert>
+                     <a class="uk-alert-close" uk-close></a>
+                        <p>{{error}}</p>
+                     </div>
+               {% endfor %}
+              {% endif %}
+        </div>
+    </div>
+   
+    <div class="uk-margin ">
+        <label class="uk-form-label" for="form-stacked-text">Email</label>
+        <div class="uk-form-controls">
+        {{ form.email(class_="uk-input uk-form-width-large" ,id_="form-stacked-text" , placeholder="Enter Email") }} 
+               {% if form.email.errors %}
+               {% for error in form.email.errors %}
+               <div class="uk-alert-danger" uk-alert>
+                     <a class="uk-alert-close" uk-close></a>
+                        <p>{{error}}</p>
+                     </div>
+               {% endfor %}
+              {% endif %}
+            
+        </div>
+    </div>
+
+    <div class="uk-margin">
+        <label class="uk-form-label center" for="form-stacked-text">Password</label>
+        <div class="uk-form-controls">
+        {{ form.password(class_="uk-input uk-form-width-large", id_="form-stacked-text" , placeholder="Enter Password" ) }} 
+               {% if form.password.errors %}
+               {% for error in form.password.errors %}
+               <div class="uk-alert-danger" uk-alert>
+                     <a class="uk-alert-close" uk-close></a>
+                        <p>{{error}}</p>
+                     </div>
+               {% endfor %}
+              {% endif %}
+            
+        </div>
+    </div>
+     <div class="uk-margin">
+     {{form.Register(class_="uk-button uk-button-primary")}}
+    </div>
+     <div class="uk-margin">
+     <p>Register for new Account <a>Register</a></p>
+     </div>
+    
+</form>
+</div>
+</div>
+
+
+{% endblock  %} 

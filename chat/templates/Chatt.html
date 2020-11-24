@@ -1,0 +1,258 @@
+
+{% extends 'base.html' %}
+{% block title %}Login{% endblock  %}
+{% block  body %}
+<div uk-sticky="sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky"> 
+  <nav class="uk-navbar-container" uk-navbar>
+
+    <div class="uk-navbar-left ">
+    <ul class="uk-navbar-nav">
+        <li class="uk-hidden@s"><a href="#my-id" uk-toggle><span uk-icon="menu"></span></a></li>
+       <li class="uk-visible@s">
+       <a class="uk-navbar-item uk-logo" href="#"><span><i class="fab fa-rocketchat" style="color: Tomato; margin-right:10px;"></i></span> Chatapp </a>
+       </li>
+       </ul>
+    </div>
+
+    <div class="uk-navbar-right ">
+
+        <ul class="uk-navbar-nav">
+            <li>
+                <a href="{{url_for('dashbord')}}">Dashbord</a>
+            </li>
+            <li ><a href="#">Welcome : {% if current_user.is_authenticated %} {{ current_user.username }}{% endif %}</a></li>
+            <li>
+                <a href="{{url_for('logout')}}">Logout</a>
+            </li>
+        </ul>
+
+    </div>
+
+</nav>
+</div >
+<div id="my-id" uk-offcanvas="overlay: true">
+        <div class="uk-offcanvas-bar">
+            <button class="uk-offcanvas-close" type="button" uk-close></button>
+            <table class="uk-table">
+            <thead >
+           <tr>
+            <th><h4><b>Choose Room </b></h4></th>
+           </tr>
+            </thead>
+              <tbody class="uk-align-center">
+                 {% if current_user.room %}
+               <tr>
+            <td><button class="choseroom uk-button uk-button-default">{{current_user.room}}</button></td>
+                  </tr>
+                {% endif %}
+            {% for i in all_friend %}
+              <tr>
+            <td><button class="choseroom uk-button uk-button-default" id="choseroom">{{i.room_name}}</button></td>
+               </tr>
+                   {% endfor %}
+       
+                 </tbody>
+               </table>
+             
+        </div>
+    </div>
+{% block messageshow %}
+
+         {% with messages = get_flashed_messages(with_categories=true) %}
+         {% if messages %}
+         {% for message in messages %}
+         <div class="uk-alert-{{message[0]}}" uk-alert>
+         <a class="uk-alert-close" uk-close></a>
+         <p class="uk-text-center" >{{message[1]}}.</p>
+         </div>
+         {% endfor %}
+         {% endif %}
+         {% endwith %}
+{% endblock %}
+
+     <div class="uk-child-width-expand uk-child-height-expand uk-text-center uk-margin-medium-top" uk-grid>
+    <div class="uk-width-1-4@s">
+        <div class="uk-visible@s uk-card uk-card-default uk-card-body">
+        <table class="uk-table">
+    <thead >
+        <tr>
+            <th><h4><b>Choose Room </b></h4></th>
+        </tr>
+    </thead>
+    <tbody class="uk-align-center">
+    {% if current_user.room %}
+        <tr>
+            <td><button class="choseroom uk-button uk-button-default">{{current_user.room}}</button></td>
+        </tr>
+    {% endif %}
+    {% for i in all_friend %}
+        <tr>
+            <td><button class="choseroom uk-button uk-button-default" id="choseroom">{{i.room_name}}</button></td>
+        </tr>
+        {% endfor %}
+         
+       
+    </tbody>
+</table>
+</div>
+    </div>
+    <div>
+        <div class="uk-card uk-card-default uk-card-body" style="width:100%; height:100%;">
+        
+        <div class=" uk-panel uk-panel-scrollable uk-position-left" style="width:100%; height:100%;" id="display">
+        
+        
+        </div>
+       
+
+        </div>
+        <div class="uk-margin-medium-top">
+    <div class="uk-margin" uk-margin>
+        <div uk-form-custom="target: true">
+            <input class="uk-input uk-form-width-large" type="text" placeholder="Enter message......" autofocus=true autocomplete=false id="inputmessage">
+        </div >
+        <button class="uk-button uk-button-primary" id="sendbutton" type="button">Send <i class="fas fa-paper-plane"></i></button>
+    </div>
+       </div>
+    </div>
+
+
+</div>  
+<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+    var socket = io();
+    let proom;
+    let objbtn;
+    username='{{current_user.username}}'
+    socket.on('connect', function() {
+        socket.send({'msg': " Welcome in chatapp ","username":username,"room":"NO"});
+    });
+     
+     socket.on('message',function(data){
+         if(username==data.username)
+         {
+         html="<div class='uk-alert-muted'  uk-alert><h6 class='uk-text-danger'><b>"+data.username +"</b></h6><p class='uk-text-secondary'>" + data.msg + "</p></div>"
+         }
+         else{
+          html="<div class='uk-alert-muted'  uk-alert><h6 class='uk-text-warning'><b>"+data.username +"</b></h6><p class='uk-text-secondary'>" + data.msg + "</p></div>"
+         }   
+         scrollDownChattWindow();
+       $("#display").append(html);
+       scrollDownChattWindow();
+     });
+    
+    $("#sendbutton").click(function(){
+        if($("#inputmessage").val()!="")
+        {   
+          if(typeof proom !=="undefined")
+          {
+            console.log("ok1")
+            console.log(proom)
+             socket.send({'msg':$("#inputmessage").val(),"username":username,"room":proom});
+          } 
+        else 
+        { 
+             console.log("ok2")
+             console.log(proom)
+             socket.send({'msg':$("#inputmessage").val(),"username":username,"room":"NO"});
+           
+        }
+        console.log("ok3")
+       $("#inputmessage").val("");
+        }
+        
+    });
+    $(".choseroom").click(function(){
+        if(typeof objbtn !=="undefined")
+        {$(objbtn).removeClass("uk-button-primary");
+        $(objbtn).addClass("uk-button-default")}
+        objbtn=$(this);
+        $(this).removeClass("uk-button-default");
+        $(this).addClass("uk-button-primary");
+        room=$(this).text();
+        if (room==proom)
+        {msg="You are already in room";
+        sendmessage(msg);
+        }
+        else{
+            if($(proom)!="undefined")
+            {
+            leaveRoom(proom);
+            }
+            joinRoom(room);
+            proom=room;
+        }
+    });
+
+    function joinRoom(room)
+    {
+        socket.emit('join',{"msg":"You are join room","username":username,"room":room});
+        $("#display").empty();
+    }
+    function leaveRoom(room)
+    {
+        socket.emit("leave",{"msg":"You are leave room ","username":username,"room":room});
+    }
+
+    function sendmessage(msg)
+    {
+        html="<div class='uk-alert-muted'  uk-alert><h6 class='uk-text-danger'><b>"+ username +"</b></h6><p class='uk-text-secondary'>"+ msg + "</p></div>"
+       scrollDownChattWindow();
+       $("#display").append(html);
+       scrollDownChattWindow();
+    } 
+
+    socket.on('leave',function(data){
+        if (data.username==username)
+        {
+       html="<div class='uk-alert-muted'  uk-alert><h6 class='uk-text-danger'><b>"+ data.username +"</b></h6><p class='uk-text-secondary'> You are leave the room </p></div>"
+        }
+        else{
+            html="<div class='uk-alert-muted'  uk-alert><h6 class='uk-text-danger'><b>"+ data.username +"</b></h6><p class='uk-text-secondary'>"+ data.msg + "</p></div>"
+        }
+       scrollDownChattWindow();
+       $("#display").append(html);
+       scrollDownChattWindow();
+    });
+    //document.querySelectorAll('.choseroom').forEach(button =>{
+       // button.onclick=()=>{
+            //console.log(button.innerHTML);
+      //  }
+   // })
+
+   // After enter key send message
+
+   $("#inputmessage").keyup(function(event){
+       if (event.keyCode == 13)
+       {
+         if($("#inputmessage").val()!="")
+        {   
+          if(typeof proom !=="undefined")
+          {
+            console.log("ok1")
+            console.log(proom)
+             socket.send({'msg':$("#inputmessage").val(),"username":username,"room":proom});
+          } 
+        else 
+        { 
+             console.log("ok2")
+             console.log(proom)
+             socket.send({'msg':$("#inputmessage").val(),"username":username,"room":"NO"});
+           
+        }
+        console.log("ok3")
+       $("#inputmessage").val("");
+        }  
+       }
+   });
+
+    function scrollDownChattWindow(){
+        const chatwindow=document.querySelector("#display");
+        chatwindow.scrollBy(0,1050);
+    } 
+
+});
+</script>
+{% endblock  %}
