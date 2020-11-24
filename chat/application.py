@@ -21,7 +21,6 @@ app=Flask(__name__)
 # Secret_key
 app.config['SECRET_KEY'] = 'secret key'
 # Database location postgress localhost
-# app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:@localhost:5432/de3capulkm5v8k"
 app.config['SQLALCHEMY_DATABASE_URI'] = "database url"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=False
 # ininlize db(connection with database)
