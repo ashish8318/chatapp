@@ -4,6 +4,7 @@
 This chatapp created with **flask socketio** and **javascripts socket**. This is simple chatapp in which user login then he redirect on chat page or he show message you are connected. In this chat app also provide dashbord in which user create own room, upload own profile photo, send own room to any people who create register in chatapp. user also delete own friend or show all friend. user go on the chat page or select room so in this case message send in a selected room. not show all user that are connected. But user not choose room then in this case message send all user.
 
 # Demo
+![](chat/chat.png)
 # File/ Folder in chatpp
   * **application:** This is main file . This file contain createing app instance, database connection, or import all package. This file contain code that handle like registration,login,dashbord, socket connect, join room, leave room or logout functionality.
 
